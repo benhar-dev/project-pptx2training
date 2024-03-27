@@ -1,0 +1,16 @@
+{
+  "name": "nodejs-video-from-powerpoint",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "xml2js": "^0.6.2"
+  }
+}
