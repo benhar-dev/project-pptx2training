@@ -15,6 +15,7 @@ A project to create a working build process which can be migrated to github acti
 ## Supported producerData.Direction
 
 | command | description |
+| - | - |
 | {pause x} | pause the speaker for time x in seconds |
 | {new 'Name'} | instruct the build to create a new movie file from this point |
 | {speaker 'SpeakerName'} | instruct the build to use a specific voice from this point until instructed otherwise |
