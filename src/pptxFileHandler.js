@@ -1,7 +1,7 @@
 const JSZip = require("jszip");
 
-async function extractSlidesXMLContent(zipContent) {
-  const zip = await JSZip.loadAsync(zipContent);
+async function extractNotesXmlFromPptxFile(pptxFile) {
+  const zip = await JSZip.loadAsync(pptxFile);
   const slidesPromises = [];
 
   zip.folder("ppt/notesSlides").forEach((relativePath, file) => {
@@ -9,7 +9,7 @@ async function extractSlidesXMLContent(zipContent) {
       slidesPromises.push(
         file
           .async("string")
-          .then((content) => ({ content, name: relativePath }))
+          .then((content) => ({ name: relativePath, content }))
       );
     }
   });
@@ -17,4 +17,4 @@ async function extractSlidesXMLContent(zipContent) {
   return await Promise.all(slidesPromises);
 }
 
-module.exports = { extractSlidesXMLContent };
+module.exports = { extractNotesXmlFromPptxFile };

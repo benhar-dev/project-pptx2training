@@ -1,14 +1,14 @@
 const { readFileContent } = require("./src/fileReader");
-const { extractSlidesXMLContent } = require("./src/zipHandler");
+const { extractNotesXmlFromPptxFile } = require("./src/pptxFileHandler");
 const { parseXML } = require("./src/xmlParser");
 const { extractNotes } = require("./src/notesExtractor");
 
 async function extractPresenterNotes(filePath) {
   try {
-    const fileContent = await readFileContent(filePath);
-    const slidesContent = await extractSlidesXMLContent(fileContent);
+    const pptxFile = await readFileContent(filePath);
+    const notesXml = await extractNotesXmlFromPptxFile(pptxFile);
     const parsedSlides = await parseXML(
-      slidesContent.map((slide) => ({ content: slide.content }))
+      notesXml.map((slide) => ({ content: slide.content }))
     );
     const notes = extractNotes(
       parsedSlides.map((slide) => ({
