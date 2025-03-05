@@ -1,5 +1,4 @@
 import path from "path";
-
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -8,7 +7,7 @@ const __dirname = dirname(__filename);
 
 import util from "util";
 
-const logging = false;
+const logging = true;
 
 import {
   convertPowerpointToSlideMp4,
@@ -25,6 +24,7 @@ import {
   cleanUpAudioFromSlides,
 } from "./src/concat-slide-audio.js";
 import { combineSlideAudioWithVideo } from "./src/combine-slide-audio-with-video.js";
+import { concatenateVideos } from "./src/concat-slide-video.js";
 
 function log(object) {
   if (!logging) {
@@ -76,17 +76,21 @@ async function processPowerpoint(presentationPath) {
     log("Concatenated audio file created:");
     log(slideAudio);
 
-    //
-
-    console.log(slideVideos);
-    console.log(slideAudio);
-
     // combine slide audio with slide mp4
     console.log("Combining slide audio with slide mp4...");
     slideCombinedFiles = await combineSlideAudioWithVideo(
       slideAudio,
       slideVideos
     );
+    log("Combining slide audio with slide mp4 complete:");
+    log(slideCombinedFiles);
+
+    // combine slide videos in to final video
+    console.log("Combining slide videos in to final video");
+    const videoFile = await concatenateVideos(slideCombinedFiles, "test.mp4");
+    log(videoFile);
+
+    // done
   } catch (error) {
     console.error("Error during PowerPoint processing:", error);
   } finally {

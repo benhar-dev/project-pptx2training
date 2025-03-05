@@ -1,9 +1,15 @@
 import ffmpeg from "./ffmpeg-patched.js";
 import path from "path";
 import os from "os";
+import fs from "fs";
 
 function concatenateSlideAudio(files, outputFile) {
   return new Promise((resolve, reject) => {
+    if (!files.length) {
+      reject(new Error("No files provided for concatenation"));
+      return;
+    }
+
     const command = ffmpeg();
     files.forEach((file) => command.input(file));
     command
@@ -19,7 +25,10 @@ function concatenateSlideAudio(files, outputFile) {
       ])
       .output(outputFile)
       .on("end", () => resolve(outputFile))
-      .on("error", reject)
+      .on("error", (error) => {
+        console.error("FFmpeg processing error:", error);
+        reject(new Error(`Failed to concatenate files: ${error.message}`));
+      })
       .run();
   });
 }
@@ -34,6 +43,7 @@ async function createSlideAudio(slides) {
     );
 
     const filesToConcat = slide.audioData.map((audio) => audio.filepath);
+    if (!filesToConcat.length) continue; // Skip if no audio files to process
 
     try {
       const outputFile = await concatenateSlideAudio(
@@ -48,7 +58,7 @@ async function createSlideAudio(slides) {
         ":",
         error
       );
-      return null;
+      continue; // Continue processing other slides instead of returning null
     }
   }
 
@@ -56,23 +66,17 @@ async function createSlideAudio(slides) {
 }
 
 function cleanUpAudioFromSlides(data) {
-  return;
+  if (!data) return;
 
-  if (!data) {
-    return;
-  }
-
-  if (Array.isArray(data)) {
-    data.forEach((item) => {
-      fs.unlink(item.filepath, (err) => {
-        if (err) {
-          console.error(`Failed to delete file: ${item.filepath}`, err);
-        } else {
-          console.log(`Successfully deleted file: ${item.filepath}`);
-        }
-      });
+  data.forEach((item) => {
+    fs.unlink(item.filepath, (err) => {
+      if (err) {
+        console.error(`Failed to delete file: ${item.filepath}`, err);
+      } else {
+        console.log(`Successfully deleted file: ${item.filepath}`);
+      }
     });
-  }
+  });
 }
 
 export { createSlideAudio, cleanUpAudioFromSlides };

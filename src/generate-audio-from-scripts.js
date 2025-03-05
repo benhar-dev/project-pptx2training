@@ -1,18 +1,11 @@
 import fs from "fs";
-import path from "path";
-import os from "os";
-import OpenAI from "openai";
-import dotenv from "dotenv";
+import { generateSpeech } from "./open-ai-tts.js";
 import { generateTempSilentAudio } from "./ffmpeg-utils.js";
-
-dotenv.config();
 
 const DELAYS = {
   SLIDE_START_DELAY: 1,
   SLIDE_END_DELAY: 1,
 };
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 function getDuration(value) {
   if (typeof value === "number") {
@@ -28,27 +21,18 @@ async function generateAudio(slide) {
   const audioData = [];
 
   for (const script of scripts) {
+    let audioFilePath;
+
     if (script.text) {
-      const mp3 = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: "alloy",
-        input: script.text,
-      });
-
-      const audioFilePath = path.join(
-        os.tmpdir(),
-        `slide_${slide.slide}_${Math.random()
-          .toString(36)
-          .substring(2, 15)}.mp3`
-      );
-
-      const buffer = Buffer.from(await mp3.arrayBuffer());
-      await fs.promises.writeFile(audioFilePath, buffer);
-      audioData.push({ filepath: audioFilePath });
+      audioFilePath = await generateSpeech(script.text);
     } else if (script.pause) {
       const duration = getDuration(script.pause);
-      const silentAudio = await generateTempSilentAudio(duration);
-      audioData.push({ filepath: silentAudio.path });
+      const silentAudioFile = await generateTempSilentAudio(duration);
+      audioFilePath = silentAudioFile.path;
+    }
+
+    if (audioFilePath) {
+      audioData.push({ filepath: audioFilePath });
     }
   }
 
