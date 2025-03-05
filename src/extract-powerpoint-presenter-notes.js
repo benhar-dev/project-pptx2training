@@ -1,6 +1,6 @@
-const fs = require("fs");
-const JSZip = require("jszip");
-const xml2js = require("xml2js");
+import fs from "fs";
+import JSZip from "jszip";
+import xml2js from "xml2js";
 
 async function extractPowerpointPresenterNotes(presentationPath) {
   try {
@@ -84,4 +84,5 @@ async function parseXML(contents) {
   }
   return parsedContents;
 }
-module.exports = { extractPowerpointPresenterNotes };
+
+export { extractPowerpointPresenterNotes };

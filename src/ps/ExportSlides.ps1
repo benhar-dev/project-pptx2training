@@ -41,8 +41,8 @@ try {
                 Start-Sleep -Seconds 0.5
             }
             $resultObject = [PSCustomObject]@{
-                slide     = $i
-                videoPath = $outputVideoPath
+                slide    = $i
+                filepath = $outputVideoPath
             }
             $results += $resultObject
         }

@@ -1,5 +1,13 @@
-const { exec } = require("child_process");
-const path = require("path");
+import fs from "fs";
+import { exec } from "child_process";
+import path from "path";
+
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const psScriptPath = path.join(__dirname, "ps", "ExportSlides.ps1");
 
 async function convertPowerpointToSlideMp4(presentationPath) {
@@ -19,7 +27,11 @@ async function convertPowerpointToSlideMp4(presentationPath) {
       }
       try {
         let jsonOutput = JSON.parse(stdout);
-        resolve(jsonOutput);
+        if (jsonOutput.success) {
+          resolve(jsonOutput.success);
+        } else {
+          reject(new Error("No success response in JSON"));
+        }
       } catch (parseError) {
         reject(parseError);
       }
@@ -27,4 +39,22 @@ async function convertPowerpointToSlideMp4(presentationPath) {
   });
 }
 
-module.exports = { convertPowerpointToSlideMp4 };
+function cleanUpSlideMp4(data) {
+  if (!data) {
+    return;
+  }
+
+  if (Array.isArray(data)) {
+    data.forEach((item) => {
+      fs.unlink(item.filepath, (err) => {
+        if (err) {
+          console.error(`Failed to delete file: ${item.filepath}`, err);
+        } else {
+          console.log(`Successfully deleted file: ${item.filepath}`);
+        }
+      });
+    });
+  }
+}
+
+export { convertPowerpointToSlideMp4, cleanUpSlideMp4 };

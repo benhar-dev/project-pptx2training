@@ -1,21 +1,30 @@
-const fs = require("fs");
-const path = require("path");
-const util = require("util");
+import path from "path";
 
-const logging = true;
-const enableVideoConversion = false;
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
-const {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+import util from "util";
+
+const logging = false;
+
+import {
   convertPowerpointToSlideMp4,
-} = require("./src/convert-powerpoint-to-slide-mp4");
-
-const {
-  extractPowerpointPresenterNotes,
-} = require("./src/extract-powerpoint-presenter-notes");
-
-const {
-  createScriptsFromPresenterNotes,
-} = require("./src/create-scripts-from-presenter-notes");
+  cleanUpSlideMp4,
+} from "./src/convert-powerpoint-to-slide-mp4.js";
+import { extractPowerpointPresenterNotes } from "./src/extract-powerpoint-presenter-notes.js";
+import { createScriptsFromPresenterNotes } from "./src/create-scripts-from-presenter-notes.js";
+import {
+  generateAudioFromScripts,
+  cleanUpAudioFromScripts,
+} from "./src/generate-audio-from-scripts.js";
+import {
+  createSlideAudio,
+  cleanUpAudioFromSlides,
+} from "./src/concat-slide-audio.js";
+import { combineSlideAudioWithVideo } from "./src/combine-slide-audio-with-video.js";
 
 function log(object) {
   if (!logging) {
@@ -29,47 +38,64 @@ function log(object) {
 const presentationPath = path.join(__dirname, "test.pptx");
 
 async function processPowerpoint(presentationPath) {
-  let conversions = [];
+  let slideVideos = [];
+  let slideScriptAudioSegments = [];
+  let slideAudio = [];
+  let slideCombinedFiles = [];
 
   try {
-    if (enableVideoConversion) {
-      conversions = await convertPowerpointToSlideMp4(presentationPath);
-      if (!conversions.success) {
-        console.error("Conversion failed, no slides found.");
-        return;
-      }
-      console.log("Conversion successful:");
-      log(conversions.success);
-    }
+    // create mp4 files for each slide
+    console.log("Creating MP4 files for each slide...");
+    slideVideos = await convertPowerpointToSlideMp4(presentationPath);
+    log("Conversion successful:");
+    log(slideVideos);
+
+    // extract presenter notes from each slide
+    console.log("Extracting presenter notes from each slide...");
     const presenterNotes = await extractPowerpointPresenterNotes(
       presentationPath
     );
     log("Presenter notes extracted:");
     log(presenterNotes);
 
-    const scripts = createScriptsFromPresenterNotes(presenterNotes);
+    // create scripts from presenter notes
+    console.log("Creating scripts from presenter notes...");
+    const slideScripts = createScriptsFromPresenterNotes(presenterNotes);
     log("Scripts created:");
-    log(scripts);
+    log(slideScripts);
+
+    // generate audio from scripts
+    console.log("Generating audio from scripts...");
+    slideScriptAudioSegments = await generateAudioFromScripts(slideScripts);
+    log("Audio files created:");
+    log(slideScriptAudioSegments);
+
+    // concatenate audio files
+    console.log("Concatenating audio files...");
+    const slideAudio = await createSlideAudio(slideScriptAudioSegments);
+    log("Concatenated audio file created:");
+    log(slideAudio);
+
+    //
+
+    console.log(slideVideos);
+    console.log(slideAudio);
+
+    // combine slide audio with slide mp4
+    console.log("Combining slide audio with slide mp4...");
+    slideCombinedFiles = await combineSlideAudioWithVideo(
+      slideAudio,
+      slideVideos
+    );
   } catch (error) {
     console.error("Error during PowerPoint processing:", error);
   } finally {
     // tidy up
-    if (conversions.success) {
-      cleanUpVideoFiles(converstions.success);
-    }
+    cleanUpSlideMp4(slideVideos);
+    cleanUpAudioFromScripts(slideScriptAudioSegments);
+    cleanUpAudioFromSlides(slideAudio);
+    // cleanUpSlideCombinedFiles(slideCombinedFiles);
   }
-}
-
-function cleanUpVideoFiles(data) {
-  data.forEach((item) => {
-    fs.unlink(item.videoPath, (err) => {
-      if (err) {
-        console.error(`Failed to delete file: ${item.videoPath}`, err);
-      } else {
-        console.log(`Successfully deleted file: ${item.videoPath}`);
-      }
-    });
-  });
 }
 
 processPowerpoint(presentationPath);
