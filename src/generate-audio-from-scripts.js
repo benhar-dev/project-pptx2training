@@ -24,7 +24,7 @@ async function generateAudio(slide, generateSpeech) {
     let audioFilePath;
 
     if (script.text) {
-      audioFilePath = await generateSpeech(script.text);
+      audioFilePath = await generateSpeech(script.text, script.voice);
     } else if (script.pause) {
       const duration = getDuration(script.pause);
       const silentAudioFile = await generateTempSilentAudio(duration);

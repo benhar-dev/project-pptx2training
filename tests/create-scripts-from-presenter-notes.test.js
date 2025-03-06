@@ -18,7 +18,7 @@ describe("createScriptsFromPresenterNotes", function () {
         slide: 1,
         scripts: [
           { pause: "SLIDE_START_DELAY" },
-          { text: "Hello world! This is a test." },
+          { text: "Hello world! This is a test.", voice: "default" },
           { pause: "SLIDE_END_DELAY" },
         ],
       },
@@ -26,7 +26,7 @@ describe("createScriptsFromPresenterNotes", function () {
         slide: 2,
         scripts: [
           { pause: "SLIDE_START_DELAY" },
-          { text: "Hello world! This is a second test." },
+          { text: "Hello world! This is a second test.", voice: "default" },
           { pause: "SLIDE_END_DELAY" },
         ],
       },
@@ -46,7 +46,7 @@ describe("createScriptsFromPresenterNotes", function () {
       {
         slide: 1,
         scripts: [
-          { text: "Welcome to the presentation." },
+          { text: "Welcome to the presentation.", voice: "default" },
           { pause: "SLIDE_END_DELAY" },
         ],
       },
@@ -66,7 +66,7 @@ describe("createScriptsFromPresenterNotes", function () {
       {
         slide: 1,
         scripts: [
-          { text: "Welcome to the presentation." },
+          { text: "Welcome to the presentation.", voice: "default" },
           { pause: "SLIDE_END_DELAY" },
         ],
       },
@@ -87,7 +87,7 @@ describe("createScriptsFromPresenterNotes", function () {
         slide: 1,
         scripts: [
           { pause: 3 },
-          { text: "This is an introduction." },
+          { text: "This is an introduction.", voice: "default" },
           { pause: 2 },
         ],
       },
@@ -106,7 +106,10 @@ describe("createScriptsFromPresenterNotes", function () {
     const expected = [
       {
         slide: 1,
-        scripts: [{ pause: "SLIDE_START_DELAY" }, { text: "First point." }],
+        scripts: [
+          { pause: "SLIDE_START_DELAY" },
+          { text: "First point.", voice: "default" },
+        ],
       },
     ];
     const result = createScriptsFromPresenterNotes(input);
@@ -123,7 +126,101 @@ describe("createScriptsFromPresenterNotes", function () {
     const expected = [
       {
         slide: 1,
-        scripts: [{ pause: "SLIDE_START_DELAY" }, { text: "First point." }],
+        scripts: [
+          { pause: "SLIDE_START_DELAY" },
+          { text: "First point.", voice: "default" },
+        ],
+      },
+    ];
+    const result = createScriptsFromPresenterNotes(input);
+    expect(result).to.deep.equal(expected);
+  });
+  it("should handle speaker changes correctly", function () {
+    const input = [
+      {
+        slide: 1,
+        notes: [
+          "{speaker 'Alice'}Hello from Alice.",
+          "{speaker 'Bob'}Greetings from Bob.",
+        ],
+      },
+    ];
+    const expected = [
+      {
+        slide: 1,
+        scripts: [
+          { pause: "SLIDE_START_DELAY" },
+          { text: "Hello from Alice.", voice: "Alice" },
+          { text: "Greetings from Bob.", voice: "Bob" },
+          { pause: "SLIDE_END_DELAY" },
+        ],
+      },
+    ];
+    const result = createScriptsFromPresenterNotes(input);
+    expect(result).to.deep.equal(expected);
+  });
+  it("should not add default pause at the start or end when both {no pause} directives are used", function () {
+    const input = [
+      {
+        slide: 1,
+        notes: ["{no pause}Start immediately.", "End without delay.{no pause}"],
+      },
+    ];
+    const expected = [
+      {
+        slide: 1,
+        scripts: [
+          { text: "Start immediately. End without delay.", voice: "default" },
+        ],
+      },
+    ];
+    const result = createScriptsFromPresenterNotes(input);
+    expect(result).to.deep.equal(expected);
+  });
+
+  it("should correctly process a mix of pauses and speaker changes", function () {
+    const input = [
+      {
+        slide: 1,
+        notes: [
+          "{speaker 'Alice'}Hello {pause 2000}",
+          "{speaker 'Bob'}Greetings{no pause}",
+        ],
+      },
+    ];
+    const expected = [
+      {
+        slide: 1,
+        scripts: [
+          { pause: "SLIDE_START_DELAY" },
+          { text: "Hello", voice: "Alice" },
+          { pause: 2000 },
+          { text: "Greetings", voice: "Bob" },
+        ],
+      },
+    ];
+    const result = createScriptsFromPresenterNotes(input);
+    expect(result).to.deep.equal(expected);
+  });
+
+  it("should correctly process speaker changes", function () {
+    const input = [
+      {
+        slide: 1,
+        notes: [
+          "{speaker 'Alice'}Hello my name is Alice, {speaker 'Bob'}and my name is Bob",
+        ],
+      },
+    ];
+    const expected = [
+      {
+        slide: 1,
+        scripts: [
+          { pause: "SLIDE_START_DELAY" },
+          { text: "Hello my name is Alice,", voice: "Alice" },
+          { text: "and my name is Bob", voice: "Bob" },
+          { pause: "SLIDE_END_DELAY" },
+        ],
       },
     ];
     const result = createScriptsFromPresenterNotes(input);

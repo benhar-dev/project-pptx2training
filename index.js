@@ -35,7 +35,7 @@ function log(object) {
   );
 }
 
-const presentationPath = path.join(__dirname, "test.pptx");
+const presentationPath = path.join(__dirname, "PowerPoint2Video Tutorial.pptx");
 
 async function processPowerpoint(presentationPath) {
   let slideVideos = [];
@@ -87,7 +87,10 @@ async function processPowerpoint(presentationPath) {
 
     // combine slide videos in to final video
     console.log("Combining slide videos in to final video");
-    const videoFile = await concatenateVideos(slideCombinedFiles, "test.mp4");
+    const videoFile = await concatenateVideos(
+      slideCombinedFiles,
+      "PowerPoint2Video Tutorial.mp4"
+    );
     log(videoFile);
 
     // done
@@ -95,9 +98,9 @@ async function processPowerpoint(presentationPath) {
     console.error("Error during PowerPoint processing:", error);
   } finally {
     // tidy up
-    // cleanUpSlideMp4(slideVideos);
-    // cleanUpAudioFromScripts(slideScriptAudioSegments);
-    // cleanUpAudioFromSlides(slideAudio);
+    cleanUpSlideMp4(slideVideos);
+    cleanUpAudioFromScripts(slideScriptAudioSegments);
+    cleanUpAudioFromSlides(slideAudio);
     // cleanUpSlideCombinedFiles(slideCombinedFiles);
   }
 }

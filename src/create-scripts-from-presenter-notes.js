@@ -1,4 +1,5 @@
 function createScriptsFromPresenterNotes(presenterNotes) {
+  let currentVoice = "default"; // Default voice name
   let scriptData = [];
   presenterNotes.forEach((slide) => {
     console.log(`- processing slide ${slide.slide}`);
@@ -37,21 +38,37 @@ function createScriptsFromPresenterNotes(presenterNotes) {
 
     slide.notes.forEach((note, index) => {
       note = cleanNote(note);
-
-      // Split the note into text and potential pause
       const parts = note
-        .split(/(\{pause \d+\})/)
-        .filter((part) => part !== "" && !part.includes("{no pause}"));
+        .split(/(\{pause \d+\})/) // First split by pauses
+        .flatMap((part) => part.split(/(\{speaker ['‘][^'‘]+['’]\})/)) // Then split each part by speaker
+        .filter((part) => part !== "" && !part.includes("{no pause}")); // Finally, filter the parts
+
       parts.forEach((part) => {
         if (part.startsWith("{pause")) {
           // Add current text to scripts and reset
           if (currentScript.trim() !== "") {
-            currentSlide.scripts.push({ text: currentScript.trim() });
+            currentSlide.scripts.push({
+              text: currentScript.trim(),
+              voice: currentVoice,
+            });
             currentScript = "";
           }
           // Add pause to scripts
           const pauseDuration = part.match(/\d+/)[0]; // Extract duration
           currentSlide.scripts.push({ pause: parseInt(pauseDuration) });
+        } else if (part.startsWith("{speaker")) {
+          const speakerMatch = part.match(/\{speaker ['‘]([^'‘]+)['’]\}/);
+          if (speakerMatch) {
+            // Add current text to scripts and reset
+            if (currentScript.trim() !== "") {
+              currentSlide.scripts.push({
+                text: currentScript.trim(),
+                voice: currentVoice,
+              });
+              currentScript = "";
+            }
+            currentVoice = speakerMatch[1];
+          }
         } else {
           currentScript += " " + part; // Accumulate text
         }
@@ -60,7 +77,10 @@ function createScriptsFromPresenterNotes(presenterNotes) {
 
     // Add any remaining text as a script
     if (currentScript.trim() !== "") {
-      currentSlide.scripts.push({ text: currentScript.trim() });
+      currentSlide.scripts.push({
+        text: currentScript.trim(),
+        voice: currentVoice,
+      });
     }
 
     // Apply final pause if not null and if different from initial

@@ -4,12 +4,21 @@ import dotenv from "dotenv";
 import fs from "fs";
 dotenv.config();
 
+const voiceConfig = {
+  default: { languageCode: "en-GB", name: "en-GB-Chirp-HD-D" },
+};
+
+function getPlatformVoice(role) {
+  return voiceConfig[role] || voiceConfig.default;
+}
+
 const client = new TextToSpeechClient();
 
-async function generateSpeech(text) {
+async function generateSpeech(text, voice) {
+  const platformVoice = getPlatformVoice(voice);
   const request = {
     input: { text: text },
-    voice: { languageCode: "en-GB", name: "en-GB-Chirp-HD-D" },
+    voice: platformVoice,
     audioConfig: { audioEncoding: "MP3" },
   };
 
