@@ -1,6 +1,8 @@
 function createScriptsFromPresenterNotes(presenterNotes) {
   let scriptData = [];
   presenterNotes.forEach((slide) => {
+    console.log(`- processing slide ${slide.slide}`);
+
     let currentSlide = {};
     currentSlide.slide = slide.slide;
     currentSlide.scripts = [];
@@ -34,7 +36,7 @@ function createScriptsFromPresenterNotes(presenterNotes) {
     }
 
     slide.notes.forEach((note, index) => {
-      note = note.replace(/\{no pause\}/g, "");
+      note = cleanNote(note);
 
       // Split the note into text and potential pause
       const parts = note
@@ -69,6 +71,13 @@ function createScriptsFromPresenterNotes(presenterNotes) {
     scriptData.push(currentSlide);
   });
   return scriptData;
+}
+
+function cleanNote(note) {
+  // remove any commands and powerpoint random inserts.
+  note = note.replace(/\{no pause\}/g, "");
+  note = note.replace(/Text der Fußzeile/g, "");
+  return note;
 }
 
 export { createScriptsFromPresenterNotes };

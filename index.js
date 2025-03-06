@@ -7,7 +7,7 @@ const __dirname = dirname(__filename);
 
 import util from "util";
 
-const logging = true;
+const logging = false;
 
 import {
   convertPowerpointToSlideMp4,
@@ -95,9 +95,9 @@ async function processPowerpoint(presentationPath) {
     console.error("Error during PowerPoint processing:", error);
   } finally {
     // tidy up
-    cleanUpSlideMp4(slideVideos);
-    cleanUpAudioFromScripts(slideScriptAudioSegments);
-    cleanUpAudioFromSlides(slideAudio);
+    // cleanUpSlideMp4(slideVideos);
+    // cleanUpAudioFromScripts(slideScriptAudioSegments);
+    // cleanUpAudioFromSlides(slideAudio);
     // cleanUpSlideCombinedFiles(slideCombinedFiles);
   }
 }

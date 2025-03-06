@@ -48,3 +48,53 @@ setx FFMPEG_PATH "C:\ProgramData\chocolatey\lib\ffmpeg-full\tools\ffmpeg\bin\ffm
 # set the FFPROBE_PATH
 setx FFPROBE_PATH "C:\ProgramData\chocolatey\lib\ffmpeg-full\tools\ffmpeg\bin\ffprobe.exe"
 ```
+
+### Using OpenAi Voice
+
+You will need to obtian an OpenAi API Key, which has access to the tts api.
+
+Created a .env file in the project root with the following information.
+
+```
+USE_API="openai"
+OPENAI_API_KEY="your_key_goes_here"
+```
+
+### Using Google TTS
+
+#### Getting started
+
+1. Created a .env file in the project root with the following information.
+
+   ```
+   USE_API="googletts"
+   ```
+
+2. Setup a [google cloud account](https://cloud.google.com/)
+
+3. You will need to create a project, in this example called "beckhofftraining".
+
+4. Enable the text to speach api in this project.
+
+5. Install the google cloud cli tools
+
+   In powershell type the following.
+
+   ```bash
+   (New-Object Net.WebClient).DownloadFile("https://dl.google.com/dl/cloudsdk/channels/rapid/GoogleCloudSDKInstaller.exe", "$env:Temp\GoogleCloudSDKInstaller.exe")
+
+   & $env:Temp\GoogleCloudSDKInstaller.exe
+   ```
+
+6. Follow the installer. Once installed it will open the cmd.
+
+   ```bash
+   ## this may have already been called by the installer
+   ## by default it will do this following installation.
+   gcloud init
+
+   ## You will be asked to select a cloud project, pick the one you have made in the previous steps, i.e. beckhofftraining
+
+   ## this sets up a default application login which will be used by this app
+   gcloud auth application-default login
+   ```

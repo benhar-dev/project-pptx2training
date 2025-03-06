@@ -1,9 +1,9 @@
 import fs from "fs";
-import { generateSpeech } from "./open-ai-tts.js";
 import { generateTempSilentAudio } from "./ffmpeg-utils.js";
+import ttsFactory from "./tts-factory.js";
 
 const DELAYS = {
-  SLIDE_START_DELAY: 1,
+  SLIDE_START_DELAY: 0.4,
   SLIDE_END_DELAY: 1,
 };
 
@@ -16,7 +16,7 @@ function getDuration(value) {
   return 0;
 }
 
-async function generateAudio(slide) {
+async function generateAudio(slide, generateSpeech) {
   const { scripts } = slide;
   const audioData = [];
 
@@ -40,10 +40,12 @@ async function generateAudio(slide) {
 }
 
 async function generateAudioFromScripts(slideScripts) {
+  const generateSpeech = await ttsFactory();
   const result = [];
 
   for (const slide of slideScripts) {
-    const audioData = await generateAudio(slide);
+    console.log(`- processing slide ${slide.slide}`);
+    const audioData = await generateAudio(slide, generateSpeech);
     result.push({ slide: slide.slide, audioData });
   }
 

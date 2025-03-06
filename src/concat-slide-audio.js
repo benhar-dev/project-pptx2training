@@ -43,7 +43,9 @@ async function createSlideAudio(slides) {
     );
 
     const filesToConcat = slide.audioData.map((audio) => audio.filepath);
-    if (!filesToConcat.length) continue; // Skip if no audio files to process
+    if (!filesToConcat.length) continue;
+
+    console.log(`- processing slide ${slide.slide}`);
 
     try {
       const outputFile = await concatenateSlideAudio(
@@ -58,7 +60,7 @@ async function createSlideAudio(slides) {
         ":",
         error
       );
-      continue; // Continue processing other slides instead of returning null
+      continue;
     }
   }
 

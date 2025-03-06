@@ -16,7 +16,7 @@ const openai = new OpenAI({ apiKey });
 async function generateSpeech(text) {
   const mp3 = await openai.audio.speech.create({
     model: "tts-1",
-    voice: "alloy",
+    voice: "fable",
     input: text,
   });
 

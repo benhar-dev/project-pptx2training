@@ -19,13 +19,28 @@ async function processSlide(video, audio, filepath) {
     try {
       if (videoDuration > audioDuration) {
         command = command
-          .addInput(video.filepath)
-          .addInput(audio.filepath)
+          .addInput(video.filepath) // Video input
+          .addInput(audio.filepath) // Audio input
           .complexFilter([
-            `[1:a] aevalsrc=0:d=${videoDuration - audioDuration} [silence]`,
-            `[0:a][silence] concat=n=2:v=0:a=1 [extendedAudio]`,
+            `aevalsrc=0:d=${videoDuration - audioDuration} [silence]`, // Generate silence of required length
+            `[1:a][silence] concat=n=2:v=0:a=1 [extendedAudio]`, // Concatenate original audio with silence
           ])
-          .outputOptions(["-map 0:v", "-map [extendedAudio]"]);
+          .outputOptions([
+            "-map 0:v", // Map video from the first input
+            "-map [extendedAudio]", // Map the extended audio
+            "-c:v",
+            "libx264", // Video codec configuration
+            "-preset",
+            "fast", // Encoder preset
+            "-crf",
+            "23", // Constant Rate Factor for quality
+            "-c:a",
+            "aac", // Audio codec
+            "-ar",
+            "44100", // Audio sample rate
+            "-ac",
+            "2", // Audio channels
+          ]);
       } else if (audioDuration > videoDuration) {
         command = command
           .input(video.filepath)
@@ -34,12 +49,37 @@ async function processSlide(video, audio, filepath) {
             `-filter_complex [0:v]tpad=stop_mode=clone:stop_duration=${
               audioDuration - videoDuration
             }[v];[v][1:a]concat=n=1:v=1:a=1`,
+            "-c:v",
+            "libx264",
+            "-preset",
+            "fast",
+            "-crf",
+            "23",
+            "-c:a",
+            "aac",
+            "-ar",
+            "44100",
+            "-ac",
+            "2",
           ]);
       } else {
         command = command
           .addInput(video.filepath)
           .addInput(audio.filepath)
-          .outputOptions(["-map 0:v", "-map 1:a"]);
+          .outputOptions([
+            "-c:v",
+            "libx264",
+            "-preset",
+            "fast",
+            "-crf",
+            "23",
+            "-c:a",
+            "aac",
+            "-ar",
+            "44100",
+            "-ac",
+            "2",
+          ]);
       }
     } catch (err) {
       reject(new Error(`Error setting up FFmpeg command: ${err.message}`));
@@ -61,6 +101,7 @@ async function combineSlideAudioWithVideo(audios, videos) {
       console.error(`No corresponding audio for video slide ${video.slide}`);
       new Error(`No corresponding audio for video slide ${video.slide}`);
     }
+    console.log(`- processing slide ${video.slide}`);
     try {
       const combinedVideoFilePath = createTempFilePath(
         `combinedVideo_${video.slide}`,

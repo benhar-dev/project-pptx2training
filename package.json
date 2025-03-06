@@ -11,6 +11,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/text-to-speech": "^5.8.1",
     "axios": "^1.8.1",
     "dotenv": "^16.4.7",
     "fluent-ffmpeg": "^2.1.3",
