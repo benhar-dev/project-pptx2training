@@ -25,6 +25,7 @@ import {
 } from "./src/concat-slide-audio.js";
 import { combineSlideAudioWithVideo } from "./src/combine-slide-audio-with-video.js";
 import { concatenateVideos } from "./src/concat-slide-video.js";
+import { customizeScripts } from "./src/customize-scripts.js";
 
 function log(object) {
   if (!logging) {
@@ -35,9 +36,7 @@ function log(object) {
   );
 }
 
-const presentationPath = path.join(__dirname, "PowerPoint2Video Tutorial.pptx");
-
-async function processPowerpoint(presentationPath) {
+async function processPowerpoint(presentationPath, outputPath) {
   let slideVideos = [];
   let slideScriptAudioSegments = [];
   let slideAudio = [];
@@ -64,9 +63,17 @@ async function processPowerpoint(presentationPath) {
     log("Scripts created:");
     log(slideScripts);
 
+    // create scripts from presenter notes
+    console.log("Customizing scripts...");
+    const customizedSlideScripts = await customizeScripts(slideScripts);
+    log("Scripts created:");
+    log(customizedSlideScripts);
+
     // generate audio from scripts
     console.log("Generating audio from scripts...");
-    slideScriptAudioSegments = await generateAudioFromScripts(slideScripts);
+    slideScriptAudioSegments = await generateAudioFromScripts(
+      customizedSlideScripts
+    );
     log("Audio files created:");
     log(slideScriptAudioSegments);
 
@@ -87,10 +94,7 @@ async function processPowerpoint(presentationPath) {
 
     // combine slide videos in to final video
     console.log("Combining slide videos in to final video");
-    const videoFile = await concatenateVideos(
-      slideCombinedFiles,
-      "PowerPoint2Video Tutorial.mp4"
-    );
+    const videoFile = await concatenateVideos(slideCombinedFiles, outputPath);
     log(videoFile);
 
     // done
@@ -105,4 +109,6 @@ async function processPowerpoint(presentationPath) {
   }
 }
 
-processPowerpoint(presentationPath);
+const input = path.join(__dirname, "./PowerPoint2Video Tutorial.pptx");
+const output = path.join(__dirname, "./PowerPoint2Video Tutorial.mp4");
+processPowerpoint(input, output);

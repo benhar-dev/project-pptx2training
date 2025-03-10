@@ -10,6 +10,12 @@ async function ttsFactory() {
         "./google-ai-tts.js"
       );
       return generateSpeechGoogle;
+
+    case "elevenlabstts":
+      const { generateSpeech: generateSpeechElevenLabs } = await import(
+        "./eleven-labs-tts.js"
+      );
+      return generateSpeechElevenLabs;
     case "openai":
       const { generateSpeech: generateSpeechOpenAI } = await import(
         "./open-ai-tts.js"

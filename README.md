@@ -8,8 +8,8 @@ A project to create a working build process which can be migrated to github acti
 - [x] Extract presenter notes
 - [x] Convert presenter notes to scripts
 - [ ] Check scripts for audio conversions (i.e. text replace)
-- [ ] Convert scripts to audio files
-- [ ] Combine audio with video
+- [x] Convert scripts to audio files
+- [x] Combine audio with video
 - [ ] Release updated training videos to training platform
 
 ## Supported producerData.Direction
@@ -49,6 +49,10 @@ setx FFMPEG_PATH "C:\ProgramData\chocolatey\lib\ffmpeg-full\tools\ffmpeg\bin\ffm
 setx FFPROBE_PATH "C:\ProgramData\chocolatey\lib\ffmpeg-full\tools\ffmpeg\bin\ffprobe.exe"
 ```
 
+## Choosing your voicing
+
+You only need to follow one of the sections below. The demo included as an mp4 was created using ElevenLabs + Cloned voice. This is all part of the ElevenLabs offering, when paying for the
+
 ### Using OpenAi Voice
 
 You will need to obtian an OpenAi API Key, which has access to the tts api.
@@ -58,6 +62,17 @@ Created a .env file in the project root with the following information.
 ```
 USE_API="openai"
 OPENAI_API_KEY="your_key_goes_here"
+```
+
+### Using ElevenLabs Voice
+
+You will need to obtian an ElevenLabs API Key.
+
+Created a .env file in the project root with the following information.
+
+```
+USE_API="elevenlabstts"
+ELEVENLABS_API_KEY="your_key_goes_here"
 ```
 
 ### Using Google TTS
