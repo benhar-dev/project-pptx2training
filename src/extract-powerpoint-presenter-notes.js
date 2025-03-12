@@ -6,9 +6,13 @@ async function extractPowerpointPresenterNotes(presentationPath) {
   try {
     const pptxFile = await fs.promises.readFile(presentationPath);
     const notesXml = await extractNotesXmlFromPptxFile(pptxFile);
-    const parsedSlides = await parseXML(
-      notesXml.map((slide) => ({ content: slide.content }))
+    const sortedNotesXml = notesXml.sort(
+      (a, b) => extractSlideNumber(a.name) - extractSlideNumber(b.name)
     );
+    const parsedSlides = await parseXML(
+      sortedNotesXml.map((slide) => ({ content: slide.content }))
+    );
+
     const notes = extractNotes(
       parsedSlides.map((slide) => ({
         parsedContent: slide.parsedContent,
@@ -19,6 +23,11 @@ async function extractPowerpointPresenterNotes(presentationPath) {
   } catch (error) {
     console.error("Error in extracting presenter notes:", error);
   }
+}
+
+function extractSlideNumber(filename) {
+  const match = filename.match(/notesSlide(\d+)\.xml$/);
+  return match ? parseInt(match[1], 10) : 0;
 }
 
 function extractNotes(parsedSlides) {
