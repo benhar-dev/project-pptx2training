@@ -67,15 +67,15 @@ async function createSlideAudio(slides) {
   return results;
 }
 
-function cleanUpAudioFromSlides(data) {
+function cleanUpAudioFromSlides(data, log) {
   if (!data) return;
 
   data.forEach((item) => {
     fs.unlink(item.filepath, (err) => {
       if (err) {
-        console.error(`Failed to delete file: ${item.filepath}`, err);
+        log(`Failed to delete file: ${item.filepath}`, err);
       } else {
-        console.log(`Successfully deleted file: ${item.filepath}`);
+        log(`Successfully deleted file: ${item.filepath}`);
       }
     });
   });

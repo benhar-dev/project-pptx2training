@@ -39,7 +39,7 @@ async function convertPowerpointToSlideMp4(presentationPath) {
   });
 }
 
-function cleanUpSlideMp4(data) {
+function cleanUpSlideMp4(data, log) {
   if (!data) {
     return;
   }
@@ -48,9 +48,9 @@ function cleanUpSlideMp4(data) {
     data.forEach((item) => {
       fs.unlink(item.filepath, (err) => {
         if (err) {
-          console.error(`Failed to delete file: ${item.filepath}`, err);
+          log(`Failed to delete file: ${item.filepath}`, err);
         } else {
-          console.log(`Successfully deleted file: ${item.filepath}`);
+          log(`Successfully deleted file: ${item.filepath}`);
         }
       });
     });

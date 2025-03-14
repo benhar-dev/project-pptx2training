@@ -52,7 +52,7 @@ async function generateAudioFromScripts(slideScripts) {
   return result;
 }
 
-function cleanUpAudioFromScripts(data) {
+function cleanUpAudioFromScripts(data, log) {
   if (!data) {
     return;
   }
@@ -73,9 +73,9 @@ function cleanUpAudioFromScripts(data) {
     audioFilePaths.forEach((filePath) => {
       fs.unlink(filePath, (err) => {
         if (err) {
-          console.error(`Error deleting file ${filePath}: ${err}`);
+          log(`Error deleting file ${filePath}: ${err}`);
         } else {
-          console.log(`Successfully deleted ${filePath}`);
+          log(`Successfully deleted ${filePath}`);
         }
       });
     });
