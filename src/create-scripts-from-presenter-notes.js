@@ -1,10 +1,10 @@
 const syntaxHandlers = [
   {
     name: "pause",
-    pattern: /\{pause (\d+)\}/,
+    pattern: /\{pause (\d+(?:\.\d+)?)\}/,
     handle(match, context) {
       context.flushCurrentScript();
-      context.currentSlide.scripts.push({ pause: parseInt(match[1]) });
+      context.currentSlide.scripts.push({ pause: parseFloat(match[1]) });
     },
     setupGlobalContext(globalContext) {
       //
@@ -43,7 +43,7 @@ const syntaxHandlers = [
   },
 ];
 
-function createScriptsFromPresenterNotes(presenterNotes) {
+function createScriptsFromPresenterNotes(presenterNotes, log = () => {}) {
   let scriptData = [];
   let globalContext = {};
 
@@ -52,7 +52,7 @@ function createScriptsFromPresenterNotes(presenterNotes) {
   });
 
   presenterNotes.forEach((slide) => {
-    console.log(`- processing slide ${slide.slide}`);
+    log(`- processing slide ${slide.slide}`);
 
     let context = {
       global: globalContext,
@@ -113,8 +113,9 @@ function createScriptsFromPresenterNotes(presenterNotes) {
 
     context.flushCurrentScript();
 
-    if (finalPause && finalPause !== initialPause)
+    if (finalPause && finalPause !== initialPause) {
       context.currentSlide.scripts.push(finalPause);
+    }
 
     scriptData.push(context.currentSlide);
 
@@ -125,14 +126,20 @@ function createScriptsFromPresenterNotes(presenterNotes) {
 }
 
 function getStartBoundaryPause(note) {
-  if (/^\s*\{no pause\}/.test(note) || /^\s*\{pause \d+\}/.test(note)) {
+  if (
+    /^\s*\{no pause\}/.test(note) ||
+    /^\s*\{pause (\d+(?:\.\d+)?)\}/.test(note)
+  ) {
     return null;
   }
   return { pause: "SLIDE_START_DELAY" };
 }
 
 function getEndBoundaryPause(note) {
-  if (/\{no pause\}\s*$/.test(note) || /\{pause \d+\}\s*$/.test(note)) {
+  if (
+    /\{no pause\}\s*$/.test(note) ||
+    /\{pause (\d+(?:\.\d+)?)\}\s*$/.test(note)
+  ) {
     return null;
   }
   return { pause: "SLIDE_END_DELAY" };

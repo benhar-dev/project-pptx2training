@@ -1,8 +1,22 @@
 {
-  "Text der Fußzeile": "",
-  "Beckhoff": "beckoff",
-  "4024": "40 24",
-  "4026": "40 26",
-  "TwinCAT": "twin-cat",
-  "EtherCAT": "ether-cat"
+  "\\bText der Fußzeile\\b": "",
+  "\\bBeckhoff\\b": "beckoff",
+  "\\b4024\\b": "40 24",
+  "\\b4026\\b": "40 26",
+  "\\bTwinCAT\\b": "twin-cat",
+  "\\bEtherCAT\\b": "ether-cat",
+  "\\bdoas\\b": "do as",
+  "\\bpkg\\b": "p k g",
+  "\\bTF1200\\b": "T F twelve hundred",
+  "\\bTF1200-UI-Client\\b": "T F twelve hundred hyphen u i hyphen client",
+  "HTTP://": "http colon, forward slash, forward slash",
+  "HTTPS://": "https colon, forward slash, forward slash",
+  "\\bFTP://\\b": "ftp colon, forward slash, forward slash",
+  "\\bSFTP://\\b": "sftp colon, forward slash, forward slash",
+  "\\bTelnet://\\b": "telnet colon, forward slash, forward slash",
+  "\\bSMTP://\\b": "smtp colon, forward slash, forward slash",
+  "\\bPOP3://\\b": "pop three colon, forward slash, forward slash",
+  "\\bIMAP://\\b": "imap colon, forward slash, forward slash",
+  "\\bMQTT://\\b": "m q t t colon, forward slash, forward slash",
+  "\\bWebSocket://\\b": "web socket colon, forward slash, forward slash"
 }

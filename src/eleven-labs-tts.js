@@ -12,7 +12,7 @@ if (!apiKey) {
 }
 
 const voiceConfig = {
-  default: "rWQ65dkQg5CwoiJG8WBz", //medium = 7YPv8kzNqlLVxfogcmfc //quick = rWQ65dkQg5CwoiJG8WBz
+  default: "rWQ65dkQg5CwoiJG8WBz", //medium = 7YPv8kzNqlLVxfogcmfc //quick = rWQ65dkQg5CwoiJG8WBz //second = a03QNgttMY9W9NB7ihBB
   motion: "cgSgspJ2msm6clMCkdW9",
   automation: "rWQ65dkQg5CwoiJG8WBz",
   ipc: "IKne3meq5aSn9XLyUdCD",

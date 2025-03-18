@@ -96,6 +96,27 @@ describe("createScriptsFromPresenterNotes", function () {
     expect(result).to.deep.equal(expected);
   });
 
+  it("should handle custom pause durations with decimal places", function () {
+    const input = [
+      {
+        slide: 1,
+        notes: ["{pause 3}", "This is an introduction.", "{pause 2.5}"],
+      },
+    ];
+    const expected = [
+      {
+        slide: 1,
+        scripts: [
+          { pause: 3 },
+          { text: "This is an introduction.", voice: "default" },
+          { pause: 2.5 },
+        ],
+      },
+    ];
+    const result = createScriptsFromPresenterNotes(input);
+    expect(result).to.deep.equal(expected);
+  });
+
   it("should not add default pause at the end if {no pause} is specified", function () {
     const input = [
       {

@@ -123,7 +123,7 @@ async function processPowerpoint(
     log(presenterNotes);
 
     console.log("Creating scripts from presenter notes...");
-    const slideScripts = createScriptsFromPresenterNotes(presenterNotes);
+    const slideScripts = createScriptsFromPresenterNotes(presenterNotes, log);
     log(slideScripts);
 
     console.log("Customizing scripts...");

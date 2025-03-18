@@ -7,29 +7,15 @@ async function customizeScripts(scripts) {
     const dictionaryData = await fs.readFile("dictionary.json", "utf-8");
     const dictionary = JSON.parse(dictionaryData);
 
-    // Create a lowercase dictionary for case-insensitive matching
-    const lowerCaseDictionary = Object.keys(dictionary).reduce((acc, key) => {
-      acc[key.toLowerCase()] = dictionary[key];
-      return acc;
-    }, {});
-
-    // Function to replace words based on the dictionary
+    // Function to replace words based on regex patterns from the dictionary
     const replaceWords = (text) => {
-      return text.replace(/\b\w+\b/g, (match) => {
-        const lowerCaseWord = match.toLowerCase();
-        // Check if the lowercase word is in the dictionary
-        if (lowerCaseDictionary.hasOwnProperty(lowerCaseWord)) {
-          // Preserve the original case of the first letter
-          if (match[0] === match[0].toUpperCase()) {
-            return (
-              lowerCaseDictionary[lowerCaseWord].charAt(0).toUpperCase() +
-              lowerCaseDictionary[lowerCaseWord].slice(1)
-            );
-          }
-          return lowerCaseDictionary[lowerCaseWord];
-        }
-        return match;
-      });
+      // Iterate over each pattern in the dictionary
+      for (const [pattern, replacement] of Object.entries(dictionary)) {
+        // Create a regex from the pattern, ensure to escape special characters if needed
+        const regex = new RegExp(pattern, "gi"); // 'g' for global, 'i' for case-insensitive
+        text = text.replace(regex, replacement);
+      }
+      return text;
     };
 
     // Iterate over each slide in the scripts array
